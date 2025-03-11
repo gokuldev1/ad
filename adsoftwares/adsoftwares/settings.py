@@ -131,3 +131,35 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "enquiryadsoftware@gmail.com"
 EMAIL_HOST_PASSWORD = "jeij mjcv frvk eugj"
+
+
+CORS_ALLOWED_ORIGINS = [
+    
+    "https://adsoftwares.com",
+    "https://www.adsoftwares.com",
+    "http://adsoftwares.com",
+    "http://www.adsoftwares.com",
+   
+]
+
+# CSRF_COOKIE_DOMAIN="adsoftwares.com"
+CSRF_TRUSTED_ORIGINS = [
+    
+    "https://adsoftwares.come",
+    "https://www.adsoftwares.com",
+    "http://adsoftwares.com",
+    "http://www.adsoftwares.com"
+]
+
+CORS_ALLOWED_ORIGINS = [
+    
+    "https://www.adsoftwares.com",
+    "https://adsoftwares.com",
+    "http://adsoftwares.com",
+    "http://www.adsoftwares.com",
+]
+
+
+
+
+
