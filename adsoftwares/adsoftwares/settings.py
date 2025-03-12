@@ -156,7 +156,7 @@ CORS_ALLOWED_ORIGINS = [
 # CSRF_COOKIE_DOMAIN="adsoftwares.com"
 CSRF_TRUSTED_ORIGINS = [
     
-    "https://adsoftwares.come",
+    "https://adsoftwares.com",
     "https://www.adsoftwares.com",
     "http://adsoftwares.com",
     "http://www.adsoftwares.com"
