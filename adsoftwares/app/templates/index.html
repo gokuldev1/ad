@@ -733,5 +733,46 @@
         }
     });
   </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $("#contact-form").submit(function(event) {
+        event.preventDefault(); // Prevent page refresh
+
+        var formData = $(this).serialize(); // Serialize form data
+
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: formData,
+            dataType: "json",
+            success: function(response) {
+                var messageBox = $("#response-message");
+                messageBox.removeClass("alert-danger").removeClass("alert-success");
+
+                if (response.success) {
+                    messageBox.addClass("alert-success").text(response.message).fadeIn();
+                    $("#contact-form")[0].reset(); // Reset form fields
+                } else {
+                    messageBox.addClass("alert-danger").text(response.message).fadeIn();
+                }
+
+                // Hide the message after 3 seconds
+                setTimeout(function() {
+                    messageBox.fadeOut();
+                }, 3000);
+            },
+            error: function() {
+                var messageBox = $("#response-message");
+                messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
+
+                setTimeout(function() {
+                    messageBox.fadeOut();
+                }, 3000);
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
