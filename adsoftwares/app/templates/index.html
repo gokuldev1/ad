@@ -763,14 +763,14 @@ $(document).ready(function() {
                     messageBox.fadeOut();
                 }, 3000);
             },
-            error: function() {
-                var messageBox = $("#response-message");
-                messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
+            // error: function() {
+            //     var messageBox = $("#response-message");
+            //     messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
 
-                setTimeout(function() {
-                    messageBox.fadeOut();
-                }, 3000);
-            }
+            //     setTimeout(function() {
+            //         messageBox.fadeOut();
+            //     }, 3000);
+            // }
         });
     });
 });
