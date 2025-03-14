@@ -16,7 +16,6 @@ from django.core.mail import send_mail
 
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt  # Allow AJAX requests without CSRF issues
 def send_email(request):
     if request.method == "POST":
         name = request.POST.get("name")
