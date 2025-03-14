@@ -13,6 +13,10 @@ from django.http import JsonResponse
 from django.core.mail import send_mail
 
 
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt  # Allow AJAX requests without CSRF issues
 def send_email(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -20,43 +24,47 @@ def send_email(request):
         email = request.POST.get("email")
         phone = request.POST.get("phone")
 
-        try:
-            # Message to AD Softwares
-            subject_admin = "New Contact Form Submission"
-            message_admin = f"""
-            You have received a new contact form submission:
+        if not all([name, surname, email, phone]):
+            return JsonResponse({"success": False, "message": "All fields are required."})
 
-            Name: {name} {surname}
-            Email: {email}
-            Phone: {phone}
-            """
-            
+        # Message to Admin
+        subject_admin = "New Contact Form Submission"
+        message_admin = f"""
+        You have received a new contact form submission:
+
+        Name: {name} {surname}
+        Email: {email}
+        Phone: {phone}
+        """
+
+        # Acknowledgment Email to User
+        subject_user = "Contacting AD Softwares"
+        message_user = f"""
+        Client Name: {name}
+        Email: {email}
+        Phone: {phone}
+
+        Thank you for reaching out to AD Softwares! We have received your details and will get back to you shortly.
+
+        Regards,
+        AD Softwares Team
+        """
+
+        try:
             # Send email to Admin
             send_mail(
                 subject_admin,
                 message_admin,
-                "enquiryadsoftware@gmail.com",
+                "your_email@gmail.com",  # Ensure this matches EMAIL_HOST_USER
                 ["enquiryadsoftware@gmail.com"],
                 fail_silently=False,
             )
 
-            # Acknowledgment email to the sender
-            subject_user = "Contacting AD Softwares"
-            message_user = f"""
-            Client Name: {name}
-            Email: {email}
-            Phone: {phone}
-            Thank you for reaching out to AD Softwares! We have received your details and will get back to you shortly.
-
-            Regards,
-            AD Softwares Team
-            """
-
-            # Send email to user
+            # Send email to User
             send_mail(
                 subject_user,
                 message_user,
-                "enquiryadsoftware@gmail.com",
+                "your_email@gmail.com",  # Ensure this matches EMAIL_HOST_USER
                 [email],
                 fail_silently=False,
             )
@@ -64,6 +72,6 @@ def send_email(request):
             return JsonResponse({"success": True, "message": "Your message has been sent successfully!"})
 
         except Exception as e:
-            return JsonResponse({"success": False, "message": "Failed to send the message. Please try again later."})
+            return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
 
-    return JsonResponse({"success": False, "message": "Invalid request."})
+    return JsonResponse({"success": False, "message": "Invalid request method."})
