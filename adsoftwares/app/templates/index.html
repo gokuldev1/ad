@@ -735,42 +735,46 @@
         }
     });
   </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $("#contact").submit(function(event) {  // Using 'contact' as the form ID
-        event.preventDefault(); // Prevent page refresh
-        var formData = $(this).serialize();
+    $("#contact").submit(function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        var formData = $(this).serialize(); // Serialize form data
+        var csrfToken = $("input[name='csrfmiddlewaretoken']").val(); // Get CSRF token
 
         $.ajax({
             type: "POST",
-            url: "/send_email/",
+            url: $(this).attr("action"),
             data: formData,
             dataType: "json",
+            headers: {
+                "X-CSRFToken": csrfToken  // Add CSRF token to headers
+            },
             success: function(response) {
                 var messageBox = $("#response-message");
-                messageBox.removeClass("alert-danger alert-success").hide();
+                messageBox.removeClass("alert-danger").removeClass("alert-success");
 
                 if (response.success) {
                     messageBox.addClass("alert-success").text(response.message).fadeIn();
-                    $("#contact")[0].reset(); // Reset form fields
+                    $("#contact")[0].reset(); // Reset form
                 } else {
                     messageBox.addClass("alert-danger").text(response.message).fadeIn();
                 }
 
-                // Hide the message after 3 seconds
                 setTimeout(function() {
                     messageBox.fadeOut();
                 }, 3000);
             },
-            // error: function() {
-            //     var messageBox = $("#response-message");
-            //     messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
+            error: function(xhr) {
+                var messageBox = $("#response-message");
+                messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
 
-            //     setTimeout(function() {
-            //         messageBox.fadeOut();
-            //     }, 3000);
-            // }
+                setTimeout(function() {
+                    messageBox.fadeOut();
+                }, 3000);
+            }
         });
     });
 });
