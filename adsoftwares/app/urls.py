@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     
     path('',views.index,name='index'),
-   path("send-email", views.send_email, name="send_email"),
+   path("send_email", views.send_email, name="send_email"),
 ]
 
 if settings.DEBUG:
