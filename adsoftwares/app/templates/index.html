@@ -584,37 +584,38 @@
         
        
        
-       <form id="contact" action="send_email" method="post">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-lg-12">
-            <fieldset>
-                <input type="text" name="name" id="name" placeholder="Name" required>
-            </fieldset>
-        </div>
-        <div class="col-lg-12">
-            <fieldset>
-                <input type="text" name="surname" id="surname" placeholder="Surname" required>
-            </fieldset>
-        </div>
-        <div class="col-lg-12">
-            <fieldset>
-                <input type="email" name="email" id="email" placeholder="Your Email" required>
-            </fieldset>
-        </div>
-        <div class="col-lg-12">
-            <fieldset>
-                <input type="text" name="phone" id="phone" placeholder="Your phone number" required>
-            </fieldset>
-        </div>
-        <div class="col-lg-12">
-            <fieldset>
-                <button type="submit" id="form-submit" class="main-button">Submit Request</button>
-            </fieldset>
-        </div>
-    </div>
-    <div id="response-message" class="alert" style="display: none;"></div>
-</form>
+        <form id="contact" action="{% url 'send_email' %}" method="post">
+          {% csrf_token %}
+          <div class="row">
+              <div class="col-lg-12">
+                  <fieldset>
+                      <input type="text" name="name" id="name" placeholder="Name" required>
+                  </fieldset>
+              </div>
+              <div class="col-lg-12">
+                  <fieldset>
+                      <input type="text" name="surname" id="surname" placeholder="Surname" required>
+                  </fieldset>
+              </div>
+              <div class="col-lg-12">
+                  <fieldset>
+                      <input type="email" name="email" id="email" placeholder="Your Email" required>
+                  </fieldset>
+              </div>
+              <div class="col-lg-12">
+                  <fieldset>
+                      <input type="text" name="phone" id="phone" placeholder="Your phone number" required>
+                  </fieldset>
+              </div>
+              <div class="col-lg-12">
+                  <fieldset>
+                    <button type="submit" id="form-submit" class="main-button">Submit Request</button>
+
+                  </fieldset>
+              </div>
+          </div>
+          <div id="response-message" class="alert" style="display: none;"></div>
+      </form>
 <!--         {% if messages %}
     <div class="alert alert-success">
         {% for message in messages %}
@@ -716,69 +717,67 @@
   <script src="static/js/imagesloaded.js"></script>
   <script src="static/js/custom.js"></script>
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-  // Acc
-    $(document).on("click", ".naccs .menu div", function() {
-      var numberIndex = $(this).index();
-
-      if (!$(this).is("active")) {
-          $(".naccs .menu div").removeClass("active");
-          $(".naccs ul li").removeClass("active");
-
-          $(this).addClass("active");
-          $(".naccs ul").find("li:eq(" + numberIndex + ")").addClass("active");
-
-          var listItemHeight = $(".naccs ul")
-            .find("li:eq(" + numberIndex + ")")
-            .innerHeight();
-          $(".naccs ul").height(listItemHeight + "px");
-        }
-    });
-  </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $("#contact").submit(function(event) {
-        event.preventDefault(); // Prevent default form submission
-
-        var formData = $(this).serialize(); // Serialize form data
-        var csrfToken = $("input[name='csrfmiddlewaretoken']").val(); // Get CSRF token
-
-        $.ajax({
-            type: "POST",
-            url: $(this).attr("action"),
-            data: formData,
-            dataType: "json",
-            headers: {
-                "X-CSRFToken": csrfToken  // Add CSRF token to headers
-            },
-            success: function(response) {
-                var messageBox = $("#response-message");
-                messageBox.removeClass("alert-danger").removeClass("alert-success");
-
-                if (response.success) {
-                    messageBox.addClass("alert-success").text(response.message).fadeIn();
-                    $("#contact")[0].reset(); // Reset form
-                } else {
-                    messageBox.addClass("alert-danger").text(response.message).fadeIn();
+    $(document).ready(function() {
+        $("#contact").submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            var formData = JSON.stringify({
+                name: $("#name").val(),
+                surname: $("#surname").val(),
+                email: $("#email").val(),
+                phone: $("#phone").val()
+            });
+            var csrfToken = $("input[name='csrfmiddlewaretoken']").val(); // Get CSRF token
+            var submitButton = $("#form-submit"); // Get submit button
+            
+            // Disable button and show loading text
+            submitButton.prop("disabled", true).html("Sending... <span class='spinner-border spinner-border-sm'></span>");
+    
+            $.ajax({
+                type: "POST",
+                url: "{% url 'send_email' %}",
+                data: formData,
+                dataType: "json",
+                contentType: "application/json",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                },
+                success: function(response) {
+                    var messageBox = $("#response-message");
+                    messageBox.removeClass("alert-danger").removeClass("alert-success");
+    
+                    if (response.success) {
+                        messageBox.addClass("alert-success").text(response.message).fadeIn();
+                        $("#contact").trigger("reset"); // ✅ FIXED: Reset form properly
+                    } else {
+                        messageBox.addClass("alert-danger").text(response.message).fadeIn();
+                    }
+    
+                    setTimeout(function() {
+                        messageBox.fadeOut();
+                    }, 3000);
+                },
+                error: function(xhr) {
+                    var messageBox = $("#response-message");
+                    messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
+    
+                    setTimeout(function() {
+                        messageBox.fadeOut();
+                    }, 3000);
+                },
+                complete: function() {
+                    // Restore button state
+                    submitButton.prop("disabled", false).html("Submit Request");
                 }
-
-                setTimeout(function() {
-                    messageBox.fadeOut();
-                }, 3000);
-            },
-            error: function(xhr) {
-                var messageBox = $("#response-message");
-                messageBox.addClass("alert-danger").text("Something went wrong. Please try again.").fadeIn();
-
-                setTimeout(function() {
-                    messageBox.fadeOut();
-                }, 3000);
-            }
+            });
         });
     });
-});
-</script>
+    </script>
+    
+    
+  
 
 </body>
 </html>
